@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orchowski.seminariumreactivechat.chatmessage.dto.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -15,8 +17,9 @@ import reactor.core.publisher.SignalType;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+@Controller
 @RequiredArgsConstructor
+@Slf4j
 class ChatWebSocketHandler implements WebSocketHandler {
     private final ObjectMapper objectMapper;
     private final MessageProcessor messageProcessor;
@@ -29,6 +32,7 @@ class ChatWebSocketHandler implements WebSocketHandler {
 
         var inputChanel = session.receive()
                 .map(WebSocketMessage::getPayloadAsText)
+                .doOnNext(payload -> log.info("Recived message  [{}]",payload))
                 .map(this::stringToChatMessage)
                 .doOnNext(messageProcessor::publish)
                 .doFinally(signalType -> {
