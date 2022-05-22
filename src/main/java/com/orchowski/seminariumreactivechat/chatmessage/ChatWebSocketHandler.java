@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
-public class ChatWebSocketHandler implements WebSocketHandler {
+class ChatWebSocketHandler implements WebSocketHandler {
     private final ObjectMapper objectMapper;
     private final MessageProcessor messageProcessor;
 
