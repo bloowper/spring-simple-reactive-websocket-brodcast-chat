@@ -34,7 +34,7 @@ class ChatWebSocketHandler implements WebSocketHandler {
                 .map(WebSocketMessage::getPayloadAsText)
                 .doOnNext(payload -> log.info("Session [{}] recived message  [{}]",sessionId, payload))
                 .map(this::stringToChatMessage)
-                .doOnError(JacksonException.class, e -> log.error("Session [{}] message unmarshalling failed", sessionId))
+                .onErrorContinue(JacksonException.class,(throwable, o) -> log.error("Session [{}] message unmarshalling failed", sessionId))
                 .doOnNext(messageProcessor::publish)
                 .doFinally(signalType -> {
                     if (signalType.equals(SignalType.ON_COMPLETE)) {
