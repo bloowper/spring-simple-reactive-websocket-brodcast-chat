@@ -1,4 +1,4 @@
 package com.orchowski.seminariumreactivechat.chatmessage.dto;
 
-public record ChatMessage(String userName,String message) {
+public record ChatMessageDto(String userName, String message) {
 }

@@ -1,12 +1,12 @@
 package com.orchowski.seminariumreactivechat.chatmessage;
 
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orchowski.seminariumreactivechat.chatmessage.dto.ChatMessage;
+import com.orchowski.seminariumreactivechat.chatmessage.dto.ChatMessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
@@ -32,8 +32,9 @@ class ChatWebSocketHandler implements WebSocketHandler {
 
         var inputChanel = session.receive()
                 .map(WebSocketMessage::getPayloadAsText)
-                .doOnNext(payload -> log.info("Recived message  [{}]",payload))
+                .doOnNext(payload -> log.info("Session [{}] recived message  [{}]",sessionId, payload))
                 .map(this::stringToChatMessage)
+                .doOnError(JacksonException.class, e -> log.error("Session [{}] message unmarshalling failed", sessionId))
                 .doOnNext(messageProcessor::publish)
                 .doFinally(signalType -> {
                     if (signalType.equals(SignalType.ON_COMPLETE)) {
@@ -50,12 +51,12 @@ class ChatWebSocketHandler implements WebSocketHandler {
     }
 
     @SneakyThrows
-    private ChatMessage stringToChatMessage(String json) {
-        return this.objectMapper.readValue(json, ChatMessage.class);
+    private ChatMessageDto stringToChatMessage(String json) {
+        return this.objectMapper.readValue(json, ChatMessageDto.class);
     }
 
     @SneakyThrows
-    private String chatMessageTostring(ChatMessage chatMessage) {
-        return this.objectMapper.writeValueAsString(chatMessage);
+    private String chatMessageTostring(ChatMessageDto chatMessageDto) {
+        return this.objectMapper.writeValueAsString(chatMessageDto);
     }
 }

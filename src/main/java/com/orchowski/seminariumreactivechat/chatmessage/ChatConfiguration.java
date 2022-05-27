@@ -22,7 +22,7 @@ class ChatConfiguration {
         SimpleUrlHandlerMapping handlerMapping = new SimpleUrlHandlerMapping();
         handlerMapping.setOrder(2);
         handlerMapping.setUrlMap(Map.of(
-                "/ws/chat", webSocketHandler
+                "/chat", webSocketHandler
         ));
         return handlerMapping;
     }
@@ -31,4 +31,5 @@ class ChatConfiguration {
     WebSocketHandlerAdapter webSocketHandlerAdapter() {
         return new WebSocketHandlerAdapter();
     }
+
 }
