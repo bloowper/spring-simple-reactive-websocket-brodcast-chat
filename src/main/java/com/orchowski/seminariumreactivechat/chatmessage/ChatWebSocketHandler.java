@@ -38,6 +38,7 @@ class ChatWebSocketHandler implements WebSocketHandler {
                 .doOnNext(messageProcessor::publish)
                 .doFinally(signalType -> {
                     if (signalType.equals(SignalType.ON_COMPLETE)) {
+                        log.info("Session [{}] completed", sessionId);
                         sessions.remove(sessionId);
                     }
                 });
